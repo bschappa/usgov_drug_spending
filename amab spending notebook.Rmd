@@ -19,17 +19,15 @@ ma_path <- "DSD_MCD_R20_P04_V10_YTD19_WebExport - 201216.xlsx"
 #pulling individual sheets from each dataset
 mcb_raw <- read_excel(path = mcb_path, col_names = TRUE, sheet = 2, skip = 5)
 mcb_dictionary <- read_excel(path = mcb_path, col_names = TRUE, sheet = 1, skip = 2)
-mcb_drug_description <- read_excel(path = mcb_path, col_names = TRUE, sheet = 4, skip = 4)
 
 mcd_raw <- read_excel(path = mcd_path, col_names = TRUE, sheet = 2, skip = 3)
 mcd_dictionary <- read_excel(path = mcd_path, col_names = TRUE, sheet = 1, skip = 2)
-mcd_drug_description <- read_excel(path = mcd_path, col_names = TRUE, sheet = 4, skip = 4)
 
 ma_raw <- read_excel(path = ma_path, col_names = TRUE, sheet = 2, skip = 3)
 ma_dictionary <- read_excel(path = ma_path, col_names = TRUE, sheet = 1, skip = 1)
 ma_drug_description <- read_excel(path = ma_path, col_names = TRUE, sheet = 4, skip = 4)
 
-#coerce dfs to snake_case, adding back year to variables, cleaning variable names
+#coerce dfs to snake_case, add year to beginning of variables, clean ends of variable names
 mcb2 <- as_tibble(mcb_raw, .name_repair = to_any_case) %>%
   rename_with(~str_c("2015_", .), 5:12) %>%
   rename_with(~str_c("2016_", .), 13:20) %>%
@@ -57,30 +55,10 @@ ma2 <- as_tibble(ma_raw, .name_repair = to_any_case) %>%
   rename_with(~str_replace(., "\\_[:digit:][:digit:]",""), 4:33) %>%
   rename_with(~str_replace(., "\\_[:digit:]",""), 4:33)
 
-vars <- c("total_spending", "total_dosage_units", "total_claims", "total_beneficiaries", "average_spending_per_dosage_unit", "average_spending_per_claim", "average_spending_per_beneficiary", "outlier_flag")
 ```
 
 ```{r Tidying}
 #tidying dfs and pivot longer
-# mcb_longer <- mcb2 %>%
-#   pivot_longer(
-#     cols = 5:45,
-#     names_to = "year",
-#     names_prefix = "201[[:digit:]]_",
-#     values_to = "year")
-
-# mcb_raw %>%
-#   select(5:45) %>%
-#   pivot_longer(
-#     cols = everything(),
-#     names_to = 
-#   )
-
-#tried importing with disregard of duplicate column names
-# mcb_raw2 <- read_excel(path = mcb_path, col_names = TRUE, sheet = 2, skip = 5, .name_repair = to_any_case)
-
-
-
 #create subtables for each set of columns
 mcb3 <- mcb2 %>%
   select(4:45)
@@ -158,6 +136,7 @@ mcb_long <- bind_cols(mcb3_total_spending,
                       mcb3_average_spending_per_claim,
                       mcb3_average_spending_per_beneficiary,
                       mcb3_outlier_flag)
+#mcb table is now tidied and pivoted
 
 ```
 
