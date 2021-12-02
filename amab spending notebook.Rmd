@@ -12,33 +12,31 @@ library(tidyverse)
 library(readxl)
 library(snakecase)
 #saving Medicare Part B & D, Medicaid datasets into separate paths
-MCB_path <- "DSD_PTB_R20_P06_V10_YTD19_WebExport - 201203.xlsx"
-MCD_path <- "DSD_PTD_R20_P03_V10_YTD19_WebExport.xlsx"
-MA_path <- "DSD_MCD_R20_P04_V10_YTD19_WebExport - 201216.xlsx"
+mcb_path <- "DSD_PTB_R20_P06_V10_YTD19_WebExport - 201203.xlsx"
+mcd_path <- "DSD_PTD_R20_P03_V10_YTD19_WebExport.xlsx"
+ma_path <- "DSD_MCD_R20_P04_V10_YTD19_WebExport - 201216.xlsx"
 
 #pulling individual sheets from each dataset
-MCB_raw <- read_excel(path = MCB_path, col_names = TRUE, sheet = 2, skip = 5)
-MCB_dictionary <- read_excel(path = MCB_path, col_names = TRUE, sheet = 1, skip = 2)
-MCB_drug_description <- read_excel(path = MCB_path, col_names = TRUE, sheet = 4, skip = 4)
+mcb_raw <- read_excel(path = mcb_path, col_names = TRUE, sheet = 2, skip = 5)
+mcb_dictionary <- read_excel(path = mcb_path, col_names = TRUE, sheet = 1, skip = 2)
+mcb_drug_description <- read_excel(path = mcb_path, col_names = TRUE, sheet = 4, skip = 4)
 
-MCD_raw <- read_excel(path = MCD_path, col_names = TRUE, sheet = 2, skip = 4)
-MCD_dictionary <- read_excel(path = MCD_path, col_names = TRUE, sheet = 1, skip = 2)
-MCD_drug_description <- read_excel(path = MCD_path, col_names = TRUE, sheet = 4, skip = 4)
+mcd_raw <- read_excel(path = mcd_path, col_names = TRUE, sheet = 2, skip = 3)
+mcd_dictionary <- read_excel(path = mcd_path, col_names = TRUE, sheet = 1, skip = 2)
+mcd_drug_description <- read_excel(path = mcd_path, col_names = TRUE, sheet = 4, skip = 4)
 
-MA_raw <- read_excel(path = MA_path, col_names = TRUE, sheet = 2, skip = 3)
-MA_dictionary <- read_excel(path = MA_path, col_names = TRUE, sheet = 1, skip = 1)
-MA_drug_description <- read_excel(path = MA_path, col_names = TRUE, sheet = 4, skip = 4)
+ma_raw <- read_excel(path = ma_path, col_names = TRUE, sheet = 2, skip = 3)
+ma_dictionary <- read_excel(path = ma_path, col_names = TRUE, sheet = 1, skip = 1)
+ma_drug_description <- read_excel(path = ma_path, col_names = TRUE, sheet = 4, skip = 4)
 
 ```
 
 ```{r Cleaning}
 #coerce dfs to snake_case
-MCB_raw <- as_tibble(MCB_raw, .name_repair = to_any_case)
-MCD_raw <- as_tibble(MCD_raw, .name_repair = to_any_case)
-MA_raw <- as_tibble(MA_raw, .name_repair = to_any_case)
-
-McB_filtered <- MCB_raw %>%
-  filter()
+mcb_raw <- as_tibble(mcb_raw, .name_repair = to_any_case) %>%
+  rename_with(~str_c("2015_", .), 5:12)
+mcd_raw <- as_tibble(mcd_raw, .name_repair = to_any_case)
+ma_raw <- as_tibble(ma_raw, .name_repair = to_any_case)
 
 ```
 
