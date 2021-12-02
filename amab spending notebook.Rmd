@@ -33,11 +33,32 @@ ma_drug_description <- read_excel(path = ma_path, col_names = TRUE, sheet = 4, s
 
 ```{r Cleaning}
 #coerce dfs to snake_case
-mcb_raw <- as_tibble(mcb_raw, .name_repair = to_any_case) %>%
-  rename_with(~str_c("2015_", .), 5:12)
-mcd_raw <- as_tibble(mcd_raw, .name_repair = to_any_case)
-ma_raw <- as_tibble(ma_raw, .name_repair = to_any_case)
+mcb_cleaned <- as_tibble(mcb_raw, .name_repair = to_any_case) %>%
+  rename_with(~str_c("2015_", .), 5:12) %>%
+  rename_with(~str_c("2016_", .), 13:20) %>%
+  rename_with(~str_c("2017_", .), 21:28) %>%
+  rename_with(~str_c("2018_", .), 29:36) %>%
+  rename_with(~str_c("2019_", .), 37:45) %>%
+  rename_with(~str_replace(., "\\_[:digit:][:digit:]",""), 5:45) %>%
+  rename_with(~str_replace(., "\\_[:digit:]",""), 5:45)
 
+mcd_cleaned <- as_tibble(mcd_raw, .name_repair = to_any_case) %>%
+  rename_with(~str_c("2015_", .), 4:11) %>%
+  rename_with(~str_c("2016_", .), 12:19) %>%
+  rename_with(~str_c("2017_", .), 20:27) %>%
+  rename_with(~str_c("2018_", .), 28:35) %>%
+  rename_with(~str_c("2019_", .), 36:43) %>%
+  rename_with(~str_replace(., "\\_[:digit:][:digit:]",""), 4:43) %>%
+  rename_with(~str_replace(., "\\_[:digit:]",""), 4:43)
+  
+ma_cleaned <- as_tibble(ma_raw, .name_repair = to_any_case) %>%
+  rename_with(~str_c("2015_", .), 4:9) %>%
+  rename_with(~str_c("2016_", .), 10:15) %>%
+  rename_with(~str_c("2017_", .), 16:21) %>%
+  rename_with(~str_c("2018_", .), 22:27) %>%
+  rename_with(~str_c("2019_", .), 28:33) %>%
+  rename_with(~str_replace(., "\\_[:digit:][:digit:]",""), 4:33) %>%
+  rename_with(~str_replace(., "\\_[:digit:]",""), 4:33)
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
