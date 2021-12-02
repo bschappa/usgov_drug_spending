@@ -29,11 +29,8 @@ ma_raw <- read_excel(path = ma_path, col_names = TRUE, sheet = 2, skip = 3)
 ma_dictionary <- read_excel(path = ma_path, col_names = TRUE, sheet = 1, skip = 1)
 ma_drug_description <- read_excel(path = ma_path, col_names = TRUE, sheet = 4, skip = 4)
 
-```
-
-```{r Cleaning}
-#coerce dfs to snake_case
-mcb_cleaned <- as_tibble(mcb_raw, .name_repair = to_any_case) %>%
+#coerce dfs to snake_case, adding back year to variables, cleaning variable names
+mcb2 <- as_tibble(mcb_raw, .name_repair = to_any_case) %>%
   rename_with(~str_c("2015_", .), 5:12) %>%
   rename_with(~str_c("2016_", .), 13:20) %>%
   rename_with(~str_c("2017_", .), 21:28) %>%
@@ -42,7 +39,7 @@ mcb_cleaned <- as_tibble(mcb_raw, .name_repair = to_any_case) %>%
   rename_with(~str_replace(., "\\_[:digit:][:digit:]",""), 5:45) %>%
   rename_with(~str_replace(., "\\_[:digit:]",""), 5:45)
 
-mcd_cleaned <- as_tibble(mcd_raw, .name_repair = to_any_case) %>%
+mcd2 <- as_tibble(mcd_raw, .name_repair = to_any_case) %>%
   rename_with(~str_c("2015_", .), 4:11) %>%
   rename_with(~str_c("2016_", .), 12:19) %>%
   rename_with(~str_c("2017_", .), 20:27) %>%
@@ -51,7 +48,7 @@ mcd_cleaned <- as_tibble(mcd_raw, .name_repair = to_any_case) %>%
   rename_with(~str_replace(., "\\_[:digit:][:digit:]",""), 4:43) %>%
   rename_with(~str_replace(., "\\_[:digit:]",""), 4:43)
   
-ma_cleaned <- as_tibble(ma_raw, .name_repair = to_any_case) %>%
+ma2 <- as_tibble(ma_raw, .name_repair = to_any_case) %>%
   rename_with(~str_c("2015_", .), 4:9) %>%
   rename_with(~str_c("2016_", .), 10:15) %>%
   rename_with(~str_c("2017_", .), 16:21) %>%
@@ -59,6 +56,109 @@ ma_cleaned <- as_tibble(ma_raw, .name_repair = to_any_case) %>%
   rename_with(~str_c("2019_", .), 28:33) %>%
   rename_with(~str_replace(., "\\_[:digit:][:digit:]",""), 4:33) %>%
   rename_with(~str_replace(., "\\_[:digit:]",""), 4:33)
+
+vars <- c("total_spending", "total_dosage_units", "total_claims", "total_beneficiaries", "average_spending_per_dosage_unit", "average_spending_per_claim", "average_spending_per_beneficiary", "outlier_flag")
+```
+
+```{r Tidying}
+#tidying dfs and pivot longer
+# mcb_longer <- mcb2 %>%
+#   pivot_longer(
+#     cols = 5:45,
+#     names_to = "year",
+#     names_prefix = "201[[:digit:]]_",
+#     values_to = "year")
+
+# mcb_raw %>%
+#   select(5:45) %>%
+#   pivot_longer(
+#     cols = everything(),
+#     names_to = 
+#   )
+
+#tried importing with disregard of duplicate column names
+# mcb_raw2 <- read_excel(path = mcb_path, col_names = TRUE, sheet = 2, skip = 5, .name_repair = to_any_case)
+
+
+
+#create subtables for each set of columns
+mcb3 <- mcb2 %>%
+  select(4:45)
+
+mcb3_total_spending <- mcb3 %>%
+  select(1, ends_with("total_spending")) %>%
+  pivot_longer(cols = ends_with("total_spending"),
+               names_to = "year",
+               values_to = "total_spending") %>%
+  separate(year, sep = "_total_spending", into = c("year","drop")) %>%
+  select(-drop)
+
+##this works, but now has to be applied to each distinct column for pivoting
+mcb3_total_dosage_units <- mcb3 %>%
+  select(ends_with("total_dosage_units")) %>%
+  pivot_longer(cols = ends_with("total_dosage_units"),
+               names_to = "year",
+               values_to = "total_dosage_units") %>%
+  separate(year, sep = "_total_dosage_units", into = c("year","drop")) %>%
+  select(total_dosage_units)
+
+mcb3_total_claims <- mcb3 %>%
+  select(ends_with("total_claims")) %>%
+  pivot_longer(cols = ends_with("total_claims"),
+               names_to = "year",
+               values_to = "total_claims") %>%
+  separate(year, sep = "_total_claims", into = c("year","drop")) %>%
+  select(total_claims)
+
+mcb3_total_beneficiaries <- mcb3 %>%
+  select(ends_with("total_beneficiaries")) %>%
+  pivot_longer(cols = ends_with("total_beneficiaries"),
+               names_to = "year",
+               values_to = "total_beneficiaries") %>%
+  separate(year, sep = "_total_beneficiaries", into = c("year","drop")) %>%
+  select(total_beneficiaries)
+  
+mcb3_average_spending_per_dosage_unit <- mcb3 %>%
+  select(ends_with("average_spending_per_dosage_unit")) %>%
+  pivot_longer(cols = ends_with("average_spending_per_dosage_unit"),
+               names_to = "year",
+               values_to = "average_spending_per_dosage_unit") %>%
+  separate(year, sep = "_average_spending_per_dosage_unit", into = c("year","drop")) %>%
+  select(average_spending_per_dosage_unit)
+  
+mcb3_average_spending_per_claim <- mcb3 %>%
+  select(ends_with("average_spending_per_claim")) %>%
+  pivot_longer(cols = ends_with("average_spending_per_claim"),
+               names_to = "year",
+               values_to = "average_spending_per_claim") %>%
+  separate(year, sep = "_average_spending_per_claim", into = c("year","drop")) %>%
+  select(average_spending_per_claim)
+
+mcb3_average_spending_per_beneficiary <- mcb3 %>%
+  select(ends_with("average_spending_per_beneficiary")) %>%
+  pivot_longer(cols = ends_with("average_spending_per_beneficiary"),
+               names_to = "year",
+               values_to = "average_spending_per_beneficiary") %>%
+  separate(year, sep = "_average_spending_per_beneficiary", into = c("year","drop")) %>%
+  select(average_spending_per_beneficiary)
+
+mcb3_outlier_flag <- mcb3 %>%
+  select(ends_with("outlier_flag")) %>%
+  pivot_longer(cols = ends_with("outlier_flag"),
+               names_to = "year",
+               values_to = "outlier_flag") %>%
+  separate(year, sep = "_outlier_flag", into = c("year","drop")) %>%
+  select(outlier_flag)
+
+mcb_long <- bind_cols(mcb3_total_spending,
+                      mcb3_total_dosage_units,
+                      mcb3_total_claims,
+                      mcb3_total_beneficiaries,
+                      mcb3_average_spending_per_dosage_unit,
+                      mcb3_average_spending_per_claim,
+                      mcb3_average_spending_per_beneficiary,
+                      mcb3_outlier_flag)
+
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
