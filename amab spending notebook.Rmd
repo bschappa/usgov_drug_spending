@@ -7,7 +7,7 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
-```{r Loading and Importing}
+```{r Loading and Importing, message=FALSE, include=FALSE}
 library(tidyverse)
 library(readxl)
 library(snakecase)
@@ -59,7 +59,7 @@ ma2 <- as_tibble(ma_raw, .name_repair = to_any_case) %>%
 
 ```{r Tidying}
 #tidying dfs and pivot longer
-#create subtables for each set of columns
+#create subtables of mcb for each set of columns
 mcb3 <- mcb2 %>%
   select(4:45)
 
@@ -138,6 +138,157 @@ mcb_long <- bind_cols(mcb3_total_spending,
                       mcb3_outlier_flag)
 #mcb table is now tidied and pivoted
 
+#mcb values that don't need pivoting
+mcb4 <- mcb2 %>%
+  select(4, 46, 47)
+
+#mcd subtables
+mcd3 <- mcd2 %>%
+  select(2,4:43)
+
+mcd3_total_spending <- mcd3 %>%
+  select(1, ends_with("total_spending")) %>%
+  pivot_longer(cols = ends_with("total_spending"),
+               names_to = "year",
+               values_to = "total_spending") %>%
+  separate(year, sep = "_total_spending", into = c("year", "drop")) %>%
+  select(-drop)
+
+mcd3_total_dosage_units <- mcd3 %>%
+  select(1, ends_with("total_dosage_units")) %>%
+  pivot_longer(cols = ends_with("total_dosage_units"),
+               names_to = "year",
+               values_to = "total_dosage_units") %>%
+  separate(year, sep = "_total_dosage_units", into = c("year", "drop")) %>%
+  select(total_dosage_units)
+
+mcd3_total_claims <- mcd3 %>%
+  select(1, ends_with("total_claims")) %>%
+  pivot_longer(cols = ends_with("total_claims"),
+               names_to = "year",
+               values_to = "total_claims") %>%
+  separate(year, sep = "_total_claims", into = c("year", "drop")) %>%
+  select(total_claims)
+
+mcd3_total_beneficiaries <- mcd3 %>%
+  select(1, ends_with("total_beneficiaries")) %>%
+  pivot_longer(cols = ends_with("total_beneficiaries"),
+               names_to = "year",
+               values_to = "total_beneficiaries") %>%
+  separate(year, sep = "_total_beneficiaries", into = c("year", "drop")) %>%
+  select(total_beneficiaries)
+
+mcd3_average_spending_per_dosage_unit_weighted <- mcd3 %>%
+  select(1, ends_with("average_spending_per_dosage_unit_weighted")) %>%
+  pivot_longer(cols = ends_with("average_spending_per_dosage_unit_weighted"),
+               names_to = "year",
+               values_to = "average_spending_per_dosage_unit_weighted") %>%
+  separate(year, sep = "_average_spending_per_dosage_unit_weighted", into = c("year", "drop")) %>%
+  select(average_spending_per_dosage_unit_weighted)
+
+mcd3_average_spending_per_claim <- mcd3 %>%
+  select(1, ends_with("average_spending_per_claim")) %>%
+  pivot_longer(cols = ends_with("average_spending_per_claim"),
+               names_to = "year",
+               values_to = "average_spending_per_claim") %>%
+  separate(year, sep = "_average_spending_per_claim", into = c("year", "drop")) %>%
+  select(average_spending_per_claim)
+
+mcd3_average_spending_per_beneficiary <- mcd3 %>%
+  select(1, ends_with("average_spending_per_beneficiary")) %>%
+  pivot_longer(cols = ends_with("average_spending_per_beneficiary"),
+               names_to = "year",
+               values_to = "average_spending_per_beneficiary") %>%
+  separate(year, sep = "_average_spending_per_beneficiary", into = c("year", "drop")) %>%
+  select(average_spending_per_beneficiary)
+
+mcd3_outlier_flag <- mcd3 %>%
+  select(1, ends_with("outlier_flag")) %>%
+  pivot_longer(cols = ends_with("outlier_flag"),
+               names_to = "year",
+               values_to = "outlier_flag") %>%
+  separate(year, sep = "_outlier_flag", into = c("year", "drop")) %>%
+  select(outlier_flag)
+
+mcd_long <- bind_cols(mcd3_total_spending,
+                      mcd3_total_dosage_units,
+                      mcd3_total_claims,
+                      mcd3_total_beneficiaries,
+                      mcd3_average_spending_per_dosage_unit_weighted,
+                      mcd3_average_spending_per_claim,
+                      mcd3_average_spending_per_beneficiary,
+                      mcd3_outlier_flag)
+
+#mcd table tidied and pivoted
+
+#mcd values that don't need to be pivoted
+mcd4 <- mcd %>%
+  select(2, 44, 45)
+
+#ma subtables
+ma3 <- ma2 %>%
+  select(2, 4:33)
+
+ma3_total_spending <- ma3 %>%
+  select(1, ends_with("total_spending")) %>%
+  pivot_longer(cols = ends_with("total_spending"),
+               names_to = "year",
+               values_to = "total_spending") %>%
+  separate(year, sep = "_total_spending", into = c("year", "drop")) %>%
+  select(-drop)
+
+ma3_total_dosage_units <- ma3 %>%
+  select(1, ends_with("total_dosage_units")) %>%
+  pivot_longer(cols = ends_with("total_dosage_units"),
+               names_to = "year",
+               values_to = "total_dosage_units") %>%
+  separate(year, sep = "_total_dosage_units", into = c("year", "drop")) %>%
+  select(total_dosage_units)
+
+ma3_total_claims <- ma3 %>%
+  select(1, ends_with("total_claims")) %>%
+  pivot_longer(cols = ends_with("total_claims"),
+               names_to = "year",
+               values_to = "total_claims") %>%
+  separate(year, sep = "_total_claims", into = c("year", "drop")) %>%
+  select(total_claims)
+
+ma3_average_spending_per_dosage_unit_weighted <- ma3 %>%
+  select(1, ends_with("average_spending_per_dosage_unit_weighted")) %>%
+  pivot_longer(cols = ends_with("average_spending_per_dosage_unit_weighted"),
+               names_to = "year",
+               values_to = "average_spending_per_dosage_unit_weighted") %>%
+  separate(year, sep = "_average_spending_per_dosage_unit_weighted", into = c("year", "drop")) %>%
+  select(average_spending_per_dosage_unit_weighted)
+
+ma3_average_spending_per_claim <- ma3 %>%
+  select(1, ends_with("average_spending_per_claim")) %>%
+  pivot_longer(cols = ends_with("average_spending_per_claim"),
+               names_to = "year",
+               values_to = "average_spending_per_claim") %>%
+  separate(year, sep = "_average_spending_per_claim", into = c("year", "drop")) %>%
+  select(average_spending_per_claim)
+
+ma3_outlier_flag <- ma3 %>%
+  select(1, ends_with("outlier_flag")) %>%
+  pivot_longer(cols = ends_with("outlier_flag"),
+               names_to = "year",
+               values_to = "outlier_flag") %>%
+  separate(year, sep = "_outlier_flag", into = c("year", "drop")) %>%
+  select(outlier_flag)
+
+ma_long <- bind_cols(ma3_total_spending,
+                     ma3_total_dosage_units,
+                     ma3_total_claims,
+                     ma3_average_spending_per_dosage_unit_weighted,
+                     ma3_average_spending_per_claim,
+                     ma3_outlier_flag)
+
+#ma table tidied and pivoted
+
+#ma values that don't need to be pivoted
+ma4 <- ma2 %>%
+  select(2, 34, 35)
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
