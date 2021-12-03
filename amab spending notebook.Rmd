@@ -25,7 +25,7 @@ mcd_dictionary <- read_excel(path = mcd_path, col_names = TRUE, sheet = 1, skip 
 
 ma_raw <- read_excel(path = ma_path, col_names = TRUE, sheet = 2, skip = 3)
 ma_dictionary <- read_excel(path = ma_path, col_names = TRUE, sheet = 1, skip = 1)
-ma_drug_description <- read_excel(path = ma_path, col_names = TRUE, sheet = 4, skip = 4)
+ma_drug_description <- read_excel(path = ma_path, col_names = TRUE, sheet = 4, skip = 4, .name_repair = to_any_case)
 
 #coerce dfs to snake_case, add year to beginning of variables, clean ends of variable names
 mcb2 <- as_tibble(mcb_raw, .name_repair = to_any_case) %>%
@@ -222,7 +222,7 @@ mcd_long <- bind_cols(mcd3_total_spending,
 #mcd table tidied and pivoted
 
 #mcd values that don't need to be pivoted
-mcd4 <- mcd %>%
+mcd4 <- mcd2 %>%
   select(2, 44, 45)
 
 #ma subtables
@@ -288,10 +288,37 @@ ma_long <- bind_cols(ma3_total_spending,
 
 #ma values that don't need to be pivoted
 ma4 <- ma2 %>%
-  select(2, 34, 35)
+  select(2, 3, 34, 35)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r Transforming}
+mcb_filtered <- mcb_long %>%
+  filter(str_detect(generic_name, "mab"))
+
+mcd_filtered <- mcd_long %>%
+  filter(str_detect(generic_name, "mab"))
+
+ma_filtered <- ma_long %>%
+  filter(str_detect(generic_name, "mab"))
+
+ma_drug_desc_filtered <- ma_drug_description %>%
+  filter(str_detect(generic_name, "mab"))
+```
+
+```{r}
+mcb_filtered %>%
+  filter(outlier_flag == 1) %>%
+  count()
+
+mcd_filtered %>%
+  filter(outlier_flag == 1) %>%
+  count()
+
+ma_filtered %>%
+  filter(outlier_flag == 1) %>%
+  count()
+
+```
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 
