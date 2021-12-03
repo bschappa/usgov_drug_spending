@@ -288,10 +288,19 @@ ma_long <- bind_cols(ma3_total_spending,
 
 #ma values that don't need to be pivoted
 ma4 <- ma2 %>%
-  select(2, 34, 35)
+  select(2, 3, 34, 35)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r Transforming}
+mcb_filtered <- mcb_long %>%
+  filter(str_detect(generic_name, "mab"))
+
+mcd_filtered <- mcd_long %>%
+  filter(str_detect(generic_name, "mab"))
+
+ma_filtered <- ma_long %>%
+  filter(str_detect(generic_name, "mab"))
+```
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 
