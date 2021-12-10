@@ -12,8 +12,11 @@ library(tidyverse)
 library(readxl)
 library(snakecase)
 #saving Medicare Part B & D, Medicaid datasets into separate paths
-mcb_path <- "DSD_PTB_R20_P06_V10_YTD19_WebExport - 201203.xlsx"
+#MediCare part B
+mcb_path <- "DSD_PTB_R20_P06_V10_YTD19_WebExport - 201203.xlsx" 
+#MediCare part D
 mcd_path <- "DSD_PTD_R20_P03_V10_YTD19_WebExport.xlsx"
+#MedicAid
 ma_path <- "DSD_MCD_R20_P04_V10_YTD19_WebExport - 201216.xlsx"
 
 #pulling individual sheets from each dataset
@@ -288,7 +291,14 @@ ma_long <- bind_cols(ma3_total_spending,
 
 #ma values that don't need to be pivoted
 ma4 <- ma2 %>%
-  select(2, 3, 34, 35)
+  select(2, 34, 35)
+
+#manufacturer summary
+mab_manufacturers <- ma2%>%
+  select(2,3) %>%
+  filter(str_detect(generic_name, "mab")) %>%
+  filter(generic_name != "Rimabotulinumtoxinb") %>%
+  distinct(generic_name, number_of_manufacturers)
 ```
 
 ```{r Transforming}
@@ -322,22 +332,54 @@ ma_filtered <- ma_long %>%
   filter(str_detect(generic_name, "mab")) %>%
   mutate(origin = "ma", .before = year)
 
-#combine all three into one table
+#combine all three pivoted tables into one table
 cms_spending <- bind_rows(mcb_filtered,
                           mcd_filtered,
                           ma_filtered) %>%
   #convert origin (of dataset) to a factor for easy filtering
-  mutate(origin = as_factor(origin)) %>%
+  mutate(origin = as_factor(origin),
+         year = as.integer(year)) %>%
   #quality control - this drug is NOT a monoclonal antibody
   filter(generic_name != "Rimabotulinumtoxinb") %>%
   #filter out cases with NA values in total spending - if this variable has a missing value, the whole row will have missing values
   filter(!is.na(total_spending))
-
- 
   
+
+cms_spending %>%
+  filter(outlier_flag == 0, is.na(average_spending_per_dosage_unit))
+
+#filter non-pivoted tables for mabs ONLY
+mcb4_filtered <- mcb4 %>%
+  filter(str_detect(generic_name, "mab"))  %>%
+  mutate(origin = "mcb", .after = generic_name)
+
+mcd4_filtered <- mcd4 %>%
+  filter(str_detect(generic_name, "mab"))  %>%
+  mutate(origin = "mcd", .after = generic_name)
+
+ma4_filtered <- ma4 %>%
+  filter(str_detect(generic_name, "mab"))  %>%
+  mutate(origin = "ma", .after = generic_name)
+
+#combine all three non-pivoted tables together
+cms_spending_growth_rate <- bind_rows(mcb4_filtered,
+                                      mcd4_filtered,
+                                      ma4_filtered) %>%
+  mutate(origin = as_factor(origin)) %>%
+  filter(generic_name != "Rimabotulinumtoxinb")
+
+cms_spending_growth_rate %>%
+  filter(is.na(change_in_average_spending_per_dosage_unit_2018_2019))
 
 ```
 
+```{r Visualizing}
+ggplot(cms_spending_growth_rate, aes(x = fct_reorder(generic_name, change_in_average_spending_per_dosage_unit_2018_2019), y = change_in_average_spending_per_dosage_unit_2018_2019)) +
+  geom_col() + coord_flip() + facet_wrap(~ origin)
+
+ggplot(cms_spending_growth_rate, aes(x = fct_reorder(generic_name, annual_growth_rate_in_average_spending_per_dosage_unit_2015_2019), y = annual_growth_rate_in_average_spending_per_dosage_unit_2015_2019)) +
+  geom_col() + coord_flip() + facet_wrap(~ origin)
+```
 
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
